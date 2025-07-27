@@ -198,10 +198,10 @@ const onSubmit = async (data: NewTodo) => {
         </Accordion>
 
         {/* Submit Button */}
-        <Button
-          type="submit"
-          className="w-full py-5 bg-primary hover:bg-primary-dark"
-        >
+         <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700  w-full"
+              >
           Create Task
         </Button>
       </form>

@@ -19,7 +19,7 @@ interface DateTimePickerProps {
   label?: string;
 }
 
-export function DateTimePicker({ date, setDate, label }: DateTimePickerProps) {
+export function DateTimePicker({ date, setDate }: DateTimePickerProps) {
   const [open, setOpen] = React.useState(false);
 
   const handleDateChange = (selectedDate: Date | undefined) => {
@@ -44,7 +44,7 @@ export function DateTimePicker({ date, setDate, label }: DateTimePickerProps) {
 
   return (
     <div className="grid gap-2">
-      {label && <label className="text-sm font-medium">{label}</label>}
+      {/* {label && <label className="text-sm font-medium">{label}</label>} */}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
