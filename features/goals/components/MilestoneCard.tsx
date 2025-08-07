@@ -1,43 +1,44 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, Clock, Circle } from "lucide-react";
+import { CheckCircle2, Clock, Circle, Check } from "lucide-react";
 
 type StatusType = "Completed" | "In Progress" | "Not Started";
+
+interface Subgoal {
+  title: string;
+  completed: boolean;
+}
 
 interface MilestoneCardProps {
   title: string;
   description: string;
   status: StatusType;
-  progress: number; // 0 to 100
+  subgoals?: { title: string; completed: boolean | null }[] // Optional list of subgoals
 }
 
 const statusConfig: Record<StatusType, {
   color: string;
   bg: string;
   border: string;
-  icon:React.ReactNode;
-  progressColor: string;
+  icon: React.ReactNode;
 }> = {
   "Completed": {
     color: "text-green-700",
     bg: "bg-green-100",
     border: "border-green-200",
     icon: <CheckCircle2 className="w-4 h-4 text-green-600" />,
-    progressColor: "bg-gradient-to-r from-green-500 to-emerald-500",
   },
   "In Progress": {
     color: "text-yellow-700",
     bg: "bg-yellow-100",
     border: "border-yellow-200",
     icon: <Clock className="w-4 h-4 text-yellow-600" />,
-    progressColor: "bg-gradient-to-r from-yellow-500 to-amber-500",
   },
   "Not Started": {
     color: "text-slate-600",
     bg: "bg-slate-100",
     border: "border-slate-200",
     icon: <Circle className="w-4 h-4 text-slate-500" />,
-    progressColor: "bg-slate-300",
   },
 };
 
@@ -45,41 +46,78 @@ export const MilestoneCard = ({
   title,
   description,
   status,
-  progress,
+  subgoals = [],
 }: MilestoneCardProps) => {
   const config = statusConfig[status];
 
   return (
     <div
       className={cn(
-        "group p-5 border rounded-xl transition-all duration-200",
+        "group p-5 border rounded-xl transition-all duration-200 hover:shadow-md",
         config.border,
-        `hover:${config.border.replace("border-", "border-")}`,
-        `hover:${config.bg}/30`
+        `hover:${config.bg} hover:bg-opacity-30`
       )}
     >
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${config.bg}`}>
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start gap-3">
+          <div className={`p-2 rounded-lg ${config.bg} mt-0.5`}>
             {config.icon}
           </div>
-          <div>
-            <h3 className="font-semibold text-slate-900">{title}</h3>
-            <p className="text-sm text-slate-600">{description}</p>
+          <div className="flex-1">
+            <h3 className="font-semibold text-slate-900 text-sm md:text-base">{title}</h3>
+            <p className="text-sm text-slate-600 mt-1">{description}</p>
           </div>
         </div>
         <span
-          className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.color} ${config.border}`}
+          className={cn(
+            "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap",
+            config.bg,
+            config.color,
+            config.border
+          )}
         >
           {status}
         </span>
       </div>
-      <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-        <div
-          className={`${config.progressColor} h-full transition-all duration-500`}
-          style={{ width: `${progress}%` }}
-        ></div>
-      </div>
+
+      {/* Subgoals List */}
+      {subgoals.length > 0 && (
+        <div className="space-y-2 mt-2">
+          {subgoals.map((subgoal, index) => (
+            <div
+              key={index}
+              className={cn(
+                "flex items-center gap-2 text-sm",
+                subgoal.completed ? "text-slate-700" : "text-slate-500"
+              )}
+            >
+              {subgoal.completed ? (
+                <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+              ) : (
+                <div className="w-4 h-4 border border-slate-300 rounded-full flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 bg-slate-300 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              )}
+              <span
+                className={cn(
+                  "transition-all duration-200",
+                  subgoal.completed
+                    ? "line-through opacity-70"
+                    : "font-medium"
+                )}
+              >
+                {subgoal.title}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Optional: Add "No subgoals" placeholder if needed */}
+      {subgoals.length === 0 && (
+        <p className="text-xs text-slate-400 italic">No subgoals defined</p>
+      )}
     </div>
   );
 };

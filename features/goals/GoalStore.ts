@@ -2,7 +2,7 @@
 import { persist } from "zustand/middleware";
 import type { Goal, NewGoal } from "@/features/goals/goalSchema";
 import { useSubgoal } from "@/features/goals/subgoalStore";
-const { subgoals} = useSubgoal();
+
 
 export type GoalStore = {
   allGoals: Goal[];
