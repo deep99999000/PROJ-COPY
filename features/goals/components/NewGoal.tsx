@@ -4,6 +4,7 @@ import { DateTimePicker } from "@/components/DateTimePicker";
 import SelectComponent from "@/components/Selectcomponent";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { generateUniqueId } from "@/features/goals/components/Gneratenub=mver";
 import { newGoalsAction } from "@/features/goals/goalaction";
 import type { NewGoal } from "@/features/goals/goalSchema";
 import { useGoal } from "@/features/goals/GoalStore";
@@ -25,14 +26,17 @@ const NewGoalDialog = ({
   const { addGoal } = useGoal();
 
   const onSub = async (data: NewGoal) => {
+    const id = generateUniqueId()
     addGoal({
       ...data,
-      user_id: user
+      user_id: user,
+      id
     });
     setIsOpen(false);
     await newGoalsAction({
       ...data,
-      user_id: user
+      user_id: user,
+      id
     });
     reset();
   };

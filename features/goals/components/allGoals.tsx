@@ -7,6 +7,7 @@ import { useDialog } from "@/hooks/usedialog";
 import { useGoal } from "@/features/goals/GoalStore";
 import { useEffect } from "react";
 import SingleGoal from "@/features/goals/components/SingleGoal";
+import { getsubGoal } from "@/features/goals/goalaction";
 
 const NewGoalDialog = dynamic(() => import("@/features/goals/components/NewGoal"), {
   ssr: false,
@@ -24,8 +25,13 @@ const AllGoals = ({ goals }: { goals: Goal[] }) => {
   useEffect(() => {
     if (goals && goals.length > 0) {
       setGoal(goals);
+      getsub()
     }
   }, [goals, setGoal]);
+  const getsub = async() => {
+    await getsubGoal(1)
+  };
+  
 
   const completedGoals = allGoals.filter(goal => goal.id > 10).length;
   const totalGoals = allGoals.length;
@@ -78,7 +84,7 @@ const AllGoals = ({ goals }: { goals: Goal[] }) => {
 
         {/* Main Content Area */}
         {allGoals.length === 0 ? (
-          // Enhanced Empty State
+          //  Empty State
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center max-w-md mx-auto">
               <div className="relative mb-8">

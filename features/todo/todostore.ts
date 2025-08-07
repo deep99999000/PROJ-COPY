@@ -1,5 +1,4 @@
-// todoStore.ts
-import { create } from "zustand";
+ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Todo, NewTodo } from "@/features/todo/todoSchema";
 
@@ -52,4 +51,4 @@ export const useTodo = create<TodoState>()(
       name: "todo-store", // localStorage key
     }
   )
-);
+);        

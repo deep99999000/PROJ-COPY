@@ -1,6 +1,8 @@
-import { create } from "zustand";
+ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Goal, NewGoal } from "@/features/goals/goalSchema";
+import { useSubgoal } from "@/features/goals/subgoalStore";
+const { subgoals} = useSubgoal();
 
 export type GoalStore = {
   allGoals: Goal[];
@@ -22,10 +24,10 @@ export const useGoal = create<GoalStore>()(
         set((state) => {
           const tempGoal: Goal = {
             ...newGoal,
-            id: Math.floor(Math.random() * 1_000_000),
             description: newGoal.description ?? null,
             category: newGoal.category ?? null,
             endDate: newGoal.endDate ?? null,
+             progress: newGoal.progress ?? null, 
           };
           return {
             allGoals: [tempGoal, ...state.allGoals],
@@ -42,4 +44,4 @@ export const useGoal = create<GoalStore>()(
       name: "goals-store",
     }
   )
-);
+  ); 

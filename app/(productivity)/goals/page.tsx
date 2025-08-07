@@ -11,35 +11,38 @@ const GoalPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const { allGoals, setGoal } = useGoal();
-
-  useEffect(() => {
-    const fetchGoals = async () => {
-      try {
-        const userId = await getuser()
-        if (!userId) {
-          setError(true);
-          return;
-        }
-
-        // Fetch from server only if store is empty
-        if (allGoals.length === 0) {
-          const goals: GoalType[] | null = await getAllUserGoals(userId);
-          if (!goals) {
-            setError(true);
-            return;
-          }
-          setGoal(goals); // Cache in Zustand
-        }
-      } catch (error) {
+  const fetchGoals = async () => {
+    try {
+      const userId = await getuser();
+      if (!userId) {
         setError(true);
-        console.log(error);
-        
-      } finally {
-        setLoading(false);
+        return;
       }
-    };
 
-    fetchGoals();
+      const goals: GoalType[] | null = await getAllUserGoals(userId);
+      if (!goals) {
+        setError(true);
+        return;
+      }
+
+      setGoal(goals); // ✅ Set into Zustand store
+    } catch (error) {
+      setError(true);
+      console.error("Failed to fetch goals:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    // ✅ Only fetch if Zustand store is empty
+    if (allGoals.length > 0) {
+      setLoading(false); // skip fetching
+      return;
+    } else {
+      fetchGoals();
+    }
+
+    // fetchGoals();
   }, [allGoals.length, setGoal]);
 
   if (loading) return <p>Loading your goals...</p>;

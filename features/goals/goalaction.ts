@@ -3,7 +3,7 @@ import { and, eq, getTableColumns } from "drizzle-orm";
 import { db } from "@/db";
 import {Goal, goalTable, type NewGoal} from "@/features/goals/goalSchema"
 import { subgoalTable } from "@/db/schema";
-
+import type { NewSubgoal } from "@/features/goals/subGoalschema";
 //get all users goal
 export const getAllUserGoals = async (user_id: number) => {
   try {
@@ -32,16 +32,34 @@ export const newGoalsAction = async(newgoal: NewGoal) => {
   }
 };
 
-export const getsubGoal = async(id: number) => {
+export const getsubGoal = async(id:number) => {
  try {
   const subgoal = await db
   .select()
   .from(subgoalTable)
-  .where(eq(subgoalTable.id,id))
+  .where(eq(subgoalTable.goal_id,id))
   console.log(subgoal);
   return subgoal
  } catch (error) {
   console.log(error);
-  
  }
+};
+export const getaallsubgoal = async(id:number) => {
+    const a = await db.select()
+    .from(subgoalTable)
+    .where(eq(subgoalTable.goal_id,id))
+    console.log(a);
+    return a
+}
+export const newSubGoalsAction = async(NewSubgoal: NewSubgoal) => {
+  try {
+    console.log(NewSubgoal); 
+    const todo = await db
+    .insert(subgoalTable)
+    .values(NewSubgoal)
+    .returning()
+    return todo;
+  } catch (error) {
+    console.log(error);
+  }
 };
