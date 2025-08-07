@@ -7,7 +7,7 @@ import {
   json
 } from "drizzle-orm/pg-core";
 import { goalTable, usersTable } from "@/db/schema";
-import { subgoalTable } from "@/features/goals/subGoalschema";
+import { subgoalTable } from "@/features/subGoals/subGoalschema";
 
 // todo table
 export const todoTable = pgTable("todotable", {

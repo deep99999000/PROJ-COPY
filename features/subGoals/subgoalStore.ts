@@ -1,7 +1,7 @@
 // stores/subgoalStore.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Subgoal,NewSubgoal } from "@/features/goals/subGoalschema";
+import type { Subgoal,NewSubgoal } from "@/features/subGoals/subGoalschema";
 
 interface SubgoalState {
   subgoals: Subgoal[];

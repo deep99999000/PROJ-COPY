@@ -6,7 +6,7 @@ import Link from 'next/link';
 import React from 'react';
 
 const SingleGoal = ({ goal }: { goal: Goal }) => {
-  const { id, name, description, category, endDate } = goal;
+  const { id, name, description, category, endDate,status } = goal;
 
   // Category styles with gradients, text colors, and emojis
   const categoryStyles: Record<string, { bg: string; text: string; icon: string; cardBg: string; emoji: string }> = {
@@ -117,6 +117,15 @@ const SingleGoal = ({ goal }: { goal: Goal }) => {
                 Ends <ShowDate date={endDate} />
               </span>
             </div>
+          )}
+
+          {/* Status */}
+          {status && (
+            <span
+              className={`mt-2 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${categoryStyle.bg} ${categoryStyle.text} group-hover:shadow-sm`}
+            >
+              {status}
+            </span>
           )}
         </div>
       </div>

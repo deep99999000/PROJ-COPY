@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useGoal } from "@/features/goals/GoalStore";
-import { useSubgoal } from "@/features/goals/subgoalStore";
+import { useSubgoal } from "@/features/subGoals/subgoalStore";
 import { getaallsubgoal } from "@/features/goals/goalaction";
 import { ShowDate } from "@/components/ShowDate";
-import { MilestoneCard } from "@/features/goals/components/MilestoneCard";
+import { MilestoneCard } from "@/features/subGoals/components/MilestoneCard";
 import { Button } from "@/components/ui/button";
 import {
   Pencil,

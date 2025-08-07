@@ -98,13 +98,30 @@ const NewGoalDialog = ({
                   render={({ field }) => (
                     <SelectComponent
                       onchangefunc={field.onChange}
-                      deafultvalue={field.value || ""}
-                      allvalues={["Health", "Career", "Learning", "Personal", "Finance", "Coding"]}
+                      deafultvalue={field.value || "Career"}
+                      allvalues={["Career", "Learning", "Personal", "Finance", "Coding"]}
                     />
                   )}
                 />
               </div>
-
+                  {/* status */}
+                  <div className="space-y-2">
+                <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <Tag className="w-4 h-4 text-purple-500" />
+                  Status
+                </Label>
+                <Controller 
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <SelectComponent
+                      onchangefunc={field.onChange}
+                      deafultvalue={field.value || ""}
+                      allvalues={["Not Started", "In Process", "Completed"]}
+                    />
+                  )}
+                />
+              </div>
               {/* Target Date */}
               <div className="space-y-2">
                 <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">

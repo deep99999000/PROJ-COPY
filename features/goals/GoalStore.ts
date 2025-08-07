@@ -1,7 +1,7 @@
  import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Goal, NewGoal } from "@/features/goals/goalSchema";
-import { useSubgoal } from "@/features/goals/subgoalStore";
+import { useSubgoal } from "@/features/subGoals/subgoalStore";
 
 
 export type GoalStore = {
@@ -27,7 +27,7 @@ export const useGoal = create<GoalStore>()(
             description: newGoal.description ?? null,
             category: newGoal.category ?? null,
             endDate: newGoal.endDate ?? null,
-             progress: newGoal.progress ?? null, 
+             status: newGoal.status ?? "not_started", 
           };
           return {
             allGoals: [tempGoal, ...state.allGoals],

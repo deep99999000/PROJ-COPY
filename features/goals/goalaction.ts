@@ -3,7 +3,7 @@ import { and, eq, getTableColumns } from "drizzle-orm";
 import { db } from "@/db";
 import {Goal, goalTable, type NewGoal} from "@/features/goals/goalSchema"
 import { subgoalTable } from "@/db/schema";
-import type { NewSubgoal } from "@/features/goals/subGoalschema";
+import type { NewSubgoal } from "@/features/subGoals/subGoalschema";
 //get all users goal
 export const getAllUserGoals = async (user_id: number) => {
   try {
