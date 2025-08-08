@@ -1,16 +1,17 @@
- import { create } from "zustand";
+import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Goal, NewGoal } from "@/features/goals/goalSchema";
 import { useSubgoal } from "@/features/subGoals/subgoalStore";
-
 
 export type GoalStore = {
   allGoals: Goal[];
   setGoal: (newGoals: Goal[]) => void;
   addGoal: (newGoal: NewGoal) => void;
+  deleteGoal: (id: number) => void;
   clearGoals: () => void;
   getGoalByIndex: (index: number) => Goal | undefined;
 };
+
 export const useGoal = create<GoalStore>()(
   persist(
     (set, get) => ({
@@ -27,12 +28,18 @@ export const useGoal = create<GoalStore>()(
             description: newGoal.description ?? null,
             category: newGoal.category ?? null,
             endDate: newGoal.endDate ?? null,
-             status: newGoal.status ?? "not_started", 
+            status: newGoal.status ?? "not_started",
           };
           return {
             allGoals: [tempGoal, ...state.allGoals],
           };
         }),
+
+      // Delete goal by id
+      deleteGoal: (id) =>
+        set((state) => ({
+          allGoals: state.allGoals.filter((goal) => goal.id !== id),
+        })),
 
       // Clear all cached goals
       clearGoals: () => set({ allGoals: [] }),
@@ -44,4 +51,4 @@ export const useGoal = create<GoalStore>()(
       name: "goals-store",
     }
   )
-  ); 
+);

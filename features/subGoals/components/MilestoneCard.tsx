@@ -1,125 +1,115 @@
-import React from "react";
-import { cn } from "@/lib/utils";
-import { CheckCircle2, Clock, Circle, Check } from "lucide-react";
-import type { Todo } from "@/features/todo/todoSchema";
+"use client"
 
-type StatusType = "Completed" | "In Progress" | "Not Started";
+import React from "react"
+import Link from "next/link"
+import { cn } from "@/lib/utils"
+import { CheckCircle2, Clock, Circle, ChevronRight, Flag } from "lucide-react"
 
-interface todo {
-  title: string;
-  completed: boolean;
-}
+type StatusType = "Completed" | "In Progress" | "Not Started"
 
 interface MilestoneCardProps {
-  id: number;
-  title: string;
-  description: string;
-  status: StatusType;
-  todos:Todo[]
+  id: number
+  title: string
+  description: string
+  status: StatusType
+  hrefBase?: string
+  className?: string
 }
 
-const statusConfig: Record<StatusType, {
-  color: string;
-  bg: string;
-  border: string;
-  icon: React.ReactNode;
-}> = {
-  "Completed": {
-    color: "text-green-700",
-    bg: "bg-green-100",
-    border: "border-green-200",
-    icon: <CheckCircle2 className="w-4 h-4 text-green-600" />,
+const statusConfig: Record<
+  StatusType,
+  {
+    badgeBg: string
+    badgeText: string
+    badgeBorder: string
+    icon: React.ReactNode
+    ring: string
+  }
+> = {
+  Completed: {
+    badgeBg: "bg-emerald-50",
+    badgeText: "text-emerald-700",
+    badgeBorder: "border-emerald-200",
+    icon: <CheckCircle2 className="w-4 h-4 text-emerald-600" />,
+    ring: "ring-emerald-100",
   },
   "In Progress": {
-    color: "text-yellow-700",
-    bg: "bg-yellow-100",
-    border: "border-yellow-200",
-    icon: <Clock className="w-4 h-4 text-yellow-600" />,
+    badgeBg: "bg-amber-50",
+    badgeText: "text-amber-700",
+    badgeBorder: "border-amber-200",
+    icon: <Clock className="w-4 h-4 text-amber-600" />,
+    ring: "ring-amber-100",
   },
   "Not Started": {
-    color: "text-slate-600",
-    bg: "bg-slate-100",
-    border: "border-slate-200",
+    badgeBg: "bg-slate-50",
+    badgeText: "text-slate-700",
+    badgeBorder: "border-slate-200",
     icon: <Circle className="w-4 h-4 text-slate-500" />,
+    ring: "ring-slate-100",
   },
-};
+}
 
-export const MilestoneCard = ({
+export function MilestoneCard({
+  id,
   title,
   description,
   status,
-  todos,
-}: MilestoneCardProps) => {
-  const config = statusConfig[status];
+  hrefBase = "/milestone",
+  className,
+}: MilestoneCardProps) {
+  const theme = statusConfig[status]
+  const href = `${hrefBase}/${id}`
 
   return (
-    <div
+    <Link
+      href={href}
+      aria-label={`Open milestone ${title}`}
       className={cn(
-        "group p-5 border rounded-xl transition-all duration-200 hover:shadow-md",
-        config.border,
-        `hover:${config.bg} hover:bg-opacity-30`
+        "block group focus:outline-none",
+        "rounded-2xl border bg-white transition-all duration-200",
+        "hover:shadow-lg hover:-translate-y-0.5",
+        "focus-visible:ring-2 focus-visible:ring-offset-2",
+        theme.ring,
+        className
       )}
     >
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-start gap-3">
-          <div className={`p-2 rounded-lg ${config.bg} mt-0.5`}>
-            {config.icon}
-          </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-slate-900 text-sm md:text-base">{title}</h3>
-            <p className="text-sm text-slate-600 mt-1">{description}</p>
-          </div>
-        </div>
-        <span
-          className={cn(
-            "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap",
-            config.bg,
-            config.color,
-            config.border
-          )}
-        >
-          {status}
-        </span>
-      </div>
-
-      {/* todos List */}
-      {todos.length > 0 && (
-        <div className="space-y-2 mt-2">
-          {todos.map((todo, index) => (
-            <div
-              key={index}
-              className={cn(
-                "flex items-center gap-2 text-sm",
-                todo.isDone? "text-slate-700" : "text-slate-500"
-              )}
-            >
-              {todo.isDone ? (
-                <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-              ) : (
-                <div className="w-4 h-4 border border-slate-300 rounded-full flex items-center justify-center">
-                  <div className="w-1.5 h-1.5 bg-slate-300 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-              )}
-              <span
-                className={cn(
-                  "transition-all duration-200",
-                  todo.isDone
-                    ? "line-through opacity-70"
-                    : "font-medium"
-                )}
-              >
-                {todo.name}
-              </span>
+      <div className="p-5">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <div className={cn("p-2 rounded-xl shadow-sm", theme.badgeBg)}>
+              <Flag className={cn("w-4 h-4", theme.badgeText)} />
             </div>
-          ))}
+            <div className="min-w-0">
+              <h3 className="font-semibold text-slate-900 text-sm md:text-base line-clamp-1">
+                {title}
+              </h3>
+              {description ? (
+                <p className="text-sm text-slate-600 mt-1 line-clamp-2">{description}</p>
+              ) : (
+                <p className="text-sm text-slate-400 mt-1 italic">No description</p>
+              )}
+            </div>
+          </div>
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap",
+              theme.badgeBg,
+              theme.badgeText,
+              theme.badgeBorder
+            )}
+          >
+            {theme.icon}
+            <span>{status}</span>
+          </span>
         </div>
-      )}
 
-      {/* Optional: Add "No todos" placeholder if needed */}
-      {todos.length === 0 && (
-        <p className="text-xs text-slate-400 italic">No todos defined</p>
-      )}
-    </div>
-  );
-};
+        {/* Footer */}
+        <div className="mt-4 flex items-center justify-end text-slate-400 group-hover:text-slate-600 transition-colors">
+          <span className="text-xs mr-1">Open</span>
+          <ChevronRight className="w-4 h-4 translate-x-0 group-hover:translate-x-0.5 transition-transform" />
+        </div>
+      </div>
+    </Link>
+  )
+}

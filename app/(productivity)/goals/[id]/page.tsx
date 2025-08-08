@@ -23,9 +23,6 @@ import type { Goal } from "@/features/goals/goalSchema";
 import { useDialog } from "@/hooks/usedialog";
 import NewSubGoalDialog from "@/features/subGoals/components/Newsubgoal";
 import type { Subgoal } from "@/features/subGoals/subGoalschema";
-import { useTodo } from "@/features/todo/todostore";
-
-
 const Page = () => {
   const params = useParams();
   const goalId = Number(params?.id);
@@ -33,7 +30,6 @@ const Page = () => {
   const { subgoals, setSubgoals } = useSubgoal();
   const [singleGoal, setSingleGoal] = useState<Goal | null>(null);
   const { open, isOpen, close } = useDialog();
-  const { todos} = useTodo();
   
   // Filter and enhance subgoals with derived status and description
   const goalSubgoals = subgoals
@@ -45,18 +41,6 @@ const Page = () => {
 
   // Calculate overall completion (based on isdone)
   const completedCount = goalSubgoals.filter((sg) => sg.isdone === true).length;
-  const overallProgress = goalSubgoals.length
-    ? Math.round((completedCount / goalSubgoals.length) * 100)
-    : 0;
-
-  // Goal status
-  const goalStatus =
-    overallProgress >= 100
-      ? "Completed"
-      : overallProgress > 0
-      ? "In Progress"
-      : "Not Started";
-
   useEffect(() => {
     const currentGoal = allGoals.find((g) => g.id === goalId) || null;
     setSingleGoal(currentGoal);
@@ -113,7 +97,7 @@ const Page = () => {
                 <div>
                   <h1 className="text-4xl font-bold text-slate-900 leading-tight">
                     {singleGoal.name}
-                  </h1>
+                  </h1>goalStatus
                   <p className="text-slate-600 text-lg mt-1">
                     {singleGoal.description || "No description provided."}
                   </p>
@@ -171,7 +155,7 @@ const Page = () => {
                 </div>
                 <div>
                   <p className="text-slate-600 text-sm font-medium">Status</p>
-                  <p className="text-base font-semibold text-slate-900">{goalStatus}</p>
+                  <p className="text-base font-semibold text-slate-900">{singleGoal.status}</p>
                 </div>
               </div>
             </div>
@@ -227,7 +211,6 @@ const Page = () => {
                 //   { title: "Review outcome", completed: false },
                 //   { title: "Mark as final", completed: false },
                 // ];
-                const TodoList = todos.filter(todo => todo.subgoal_id === subgoal.id)
                 return (
                   <MilestoneCard
                     key={index}
@@ -235,7 +218,8 @@ const Page = () => {
                     title={subgoal.name}
                     description={subgoal.description}
                     status={status}
-                    todos={TodoList}
+                    hrefBase={`/goals/${goalId}/milestone`}
+                    className="hover:shadow-lg transition-shadow duration-200"
                   />
                 );
               })}

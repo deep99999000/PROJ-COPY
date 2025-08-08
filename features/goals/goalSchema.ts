@@ -19,7 +19,7 @@ export const goalTable = pgTable("goaltable", {
   user_id: integer("user_id")
     .notNull()
     .references(() => usersTable.id),
-  status: varchar("status").default("not_started").notNull(),
+  status: varchar("status").default("Not Started").notNull(),
   category: varchar("category", { length: 100 }),
   endDate:timestamp(),
 });

@@ -2,19 +2,17 @@
 
 import React, { useState } from "react";
 import { Todo } from "@/features/todo/todoSchema";
-import {
-  updateTodosStatus,
-  deleteTodoFromdb,
-} from "@/features/todo/todoaction";
+import { updateTodosStatus, deleteTodoFromdb } from "@/features/todo/todoaction";
 import { Button } from "@/components/ui/button";
 import EditTodoDialog from "./EditTodoDialog";
 import { useTodo } from "@/features/todo/todostore";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Pencil, Trash2, Target, Flag, Calendar } from "lucide-react";
+import { Pencil, Trash2, Target, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ShowDate } from "@/components/ShowDate";
 import { useDialog } from "@/hooks/usedialog";
+import { getPriorityConfig } from "@/features/todo/components/getPriorityConfig";
 
 export const SingleTodo = ({ todo }: { todo: Todo }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -28,52 +26,28 @@ export const SingleTodo = ({ todo }: { todo: Todo }) => {
     description,
     category,
     priority,
-    startDate,
     endDate,
     isDone,
     goalName,
     subgoalName,
   } = todo;
 
+  // Toggle todo status
   const handleToggle = async () => {
     toggleTodo(id);
     await updateTodosStatus(user_id, id, !isDone);
   };
 
+  // Delete todo
   const handleDelete = (id: number) => {
     deleteTodo(id);
     deleteTodoFromdb(id);
   };
 
-  const getPriorityConfig = (priority: string) => {
-    switch (priority) {
-      case "High":
-        return {
-          className: "text-red-700 border-red-200 bg-red-50",
-          icon: <Flag className="h-3 w-3" />,
-        };
-      case "Medium":
-        return {
-          className: "text-amber-700 border-amber-200 bg-amber-50",
-          icon: <Flag className="h-3 w-3" />,
-        };
-      case "Low":
-        return {
-          className: "text-blue-700 border-blue-200 bg-blue-50",
-          icon: <Flag className="h-3 w-3" />,
-        };
-      default:
-        return {
-          className: "text-slate-700 border-slate-200 bg-slate-50",
-          icon: <Flag className="h-3 w-3" />,
-        };
-    }
-  };
-
   return (
     <div
       className={cn(
-        "group relative rounded-xl border bg-white transition-all duration-200 ease-in-out shadow-sm",
+        "group relative rounded-xl border bg-white shadow-sm transition-all duration-200",
         "hover:shadow-md hover:border-border",
         isDone && "opacity-75 bg-muted/30"
       )}
@@ -81,49 +55,41 @@ export const SingleTodo = ({ todo }: { todo: Todo }) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="p-4">
-        {/* Header */}
+        {/* === Header === */}
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 mt-0.5">
-            <Checkbox
-              checked={isDone!!}
-              onCheckedChange={handleToggle}
-              className={cn(
-                "h-5 w-5 rounded-full transition-all duration-200 border-2",
-                "data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600",
-                "hover:border-slate-400"
-              )}
-            />
-          </div>
+          {/* Checkbox */}
+          <Checkbox
+            checked={!!isDone}
+            onCheckedChange={handleToggle}
+            className={cn(
+              "h-5 w-5 rounded-full border-2 transition-all duration-200",
+              "data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600",
+              "hover:border-slate-400"
+            )}
+          />
 
+          {/* Title + Description */}
           <div className="flex-1 min-w-0">
             <h3
               className={cn(
                 "text-base font-semibold leading-tight transition-all duration-200",
-                isDone
-                  ? "line-through text-muted-foreground"
-                  : "text-foreground"
+                isDone ? "line-through text-muted-foreground" : "text-foreground"
               )}
             >
               {name}
             </h3>
-
             {description && (
-              <p
-                className={cn(
-                  "mt-1.5 text-sm leading-relaxed",
-                  isDone ? "text-muted-foreground" : "text-muted-foreground"
-                )}
-              >
+              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                 {description}
               </p>
             )}
           </div>
 
-          {/* Action Buttons */}
+          {/* Action buttons */}
           <div
             className={cn(
-              "flex items-center gap-1 transition-all duration-200",
-              "opacity-0 group-hover:opacity-100"
+              "flex items-center gap-1 opacity-0 transition-all duration-200",
+              "group-hover:opacity-100"
             )}
           >
             <Button
@@ -145,14 +111,14 @@ export const SingleTodo = ({ todo }: { todo: Todo }) => {
           </div>
         </div>
 
-        {/* Metadata Row */}
-        <div className="flex flex-wrap items-center gap-2 mt-4">
+        {/* === Metadata === */}
+        <div className="mt-4 flex flex-wrap items-center gap-2">
           {/* Priority */}
           {priority && priority !== "None" && (
             <Badge
               variant="outline"
               className={cn(
-                "capitalize font-medium border transition-colors duration-200 flex items-center gap-1",
+                "capitalize font-medium border flex items-center gap-1",
                 getPriorityConfig(priority).className
               )}
             >
@@ -195,19 +161,15 @@ export const SingleTodo = ({ todo }: { todo: Todo }) => {
           {/* Due Date */}
           {endDate && (
             <div className="flex items-center text-xs text-muted-foreground">
-              <Calendar className="h-3 w-3 mr-1" />
+              <Calendar className="mr-1 h-3 w-3" />
               <ShowDate date={endDate} />
             </div>
           )}
         </div>
       </div>
 
-      {/* Edit Dialog */}
-      <EditTodoDialog
-        initialData={todo}
-        open={isOpen}
-        setisOpen={close}
-      />
+      {/* === Edit Dialog === */}
+      <EditTodoDialog initialData={todo} open={isOpen} setisOpen={close} />
     </div>
   );
 };

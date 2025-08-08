@@ -11,7 +11,7 @@ import useUser from "@/store/useUser";
 import { Label } from "@radix-ui/react-label";
 import { Target, Sparkles, Calendar, Tag } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
-import { generateUniqueId } from "@/features/goals/components/Gneratenub=mver";
+import { generateUniqueId } from "@/lib/generateUniqueId";
 
 interface Props {
   isOpen: boolean;

@@ -63,3 +63,15 @@ export const newSubGoalsAction = async(NewSubgoal: NewSubgoal) => {
     console.log(error);
   }
 };
+export const DeleteGoalsAction = async(id:number) => {
+  try {
+    const deletedGoal = await db
+      .delete(goalTable)
+      .where(eq(goalTable.id,id))
+      .returning();
+    console.log(deletedGoal);
+    return deletedGoal;
+  } catch (error) {
+    console.log(error);
+  }
+};

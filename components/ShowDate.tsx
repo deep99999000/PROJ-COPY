@@ -23,8 +23,8 @@ export const ShowDate: React.FC<ShowDateProps> = ({ date }) => {
   }, [date]);
 
   return (
-    <p>
+    <span>
       {formattedDate}
-    </p>
+    </span>
   );
 };
