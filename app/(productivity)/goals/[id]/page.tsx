@@ -21,19 +21,10 @@ import {
 } from "lucide-react";
 import type { Goal } from "@/features/goals/goalSchema";
 import { useDialog } from "@/hooks/usedialog";
-import NewSubGoalDialog from "@/features/goals/components/Newsubgoal";
+import NewSubGoalDialog from "@/features/subGoals/components/Newsubgoal";
+import type { Subgoal } from "@/features/subGoals/subGoalschema";
+import { useTodo } from "@/features/todo/todostore";
 
-type Subgoal = {
-  id: number;
-  name: string;
-  description: string | null;
-  goal_id: number;
-  user_id: number;
-  isdone: boolean | null;
-  status: string;
-  createdAt: Date | null;
-  updatedAt: Date;
-};
 
 const Page = () => {
   const params = useParams();
@@ -42,7 +33,8 @@ const Page = () => {
   const { subgoals, setSubgoals } = useSubgoal();
   const [singleGoal, setSingleGoal] = useState<Goal | null>(null);
   const { open, isOpen, close } = useDialog();
-
+  const { todos} = useTodo();
+  
   // Filter and enhance subgoals with derived status and description
   const goalSubgoals = subgoals
     .filter((sg): sg is Subgoal => sg.goal_id === goalId)
@@ -225,24 +217,25 @@ const Page = () => {
           {/* Milestone List */}
           {goalSubgoals.length > 0 ? (
             <div className="space-y-5">
-              {goalSubgoals.map((subgoal) => {
+              {goalSubgoals.map((subgoal,index) => {
                 const status: "Completed" | "In Progress" | "Not Started" =
                   subgoal.isdone ? "Completed" : "Not Started";
 
                 // Simulate subgoal checklist
-                const subgoalList = [
-                  { title: `Complete ${subgoal.name.toLowerCase()}`, completed: subgoal.isdone },
-                  { title: "Review outcome", completed: false },
-                  { title: "Mark as final", completed: false },
-                ];
-
+                // const subgoalList = [
+                //   { title: `Complete ${subgoal.name.toLowerCase()}`, completed: subgoal.isdone },
+                //   { title: "Review outcome", completed: false },
+                //   { title: "Mark as final", completed: false },
+                // ];
+                const TodoList = todos.filter(todo => todo.subgoal_id === subgoal.id)
                 return (
                   <MilestoneCard
-                    key={subgoal.id}
+                    key={index}
+                    id={subgoal.id}
                     title={subgoal.name}
                     description={subgoal.description}
                     status={status}
-                    subgoals={subgoalList}
+                    todos={TodoList}
                   />
                 );
               })}

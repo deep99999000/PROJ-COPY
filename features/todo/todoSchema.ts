@@ -4,7 +4,8 @@ import {
   varchar,
   boolean,
   timestamp,
-  json
+  json,
+  bigint
 } from "drizzle-orm/pg-core";
 import { goalTable, usersTable } from "@/db/schema";
 import { subgoalTable } from "@/features/subGoals/subGoalschema";
@@ -24,8 +25,8 @@ export const todoTable = pgTable("todotable", {
   endDate: timestamp("end_date", { mode: "date" }),
 
   // Foreign keys
-  goal_id: integer("goal_id").references(() => goalTable.id),
-  subgoal_id: integer("subgoal_id").references(() => subgoalTable.id),
+  goal_id:  bigint("goal_id", { mode: "number" }).references(() => goalTable.id),
+  subgoal_id:  bigint("subGoal_id", { mode: "number" }).references(() => subgoalTable.id),
 });
 
 // types

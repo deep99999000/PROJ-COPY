@@ -5,11 +5,12 @@ import {
   timestamp,
   boolean,
   pgEnum,
+  bigint,
 } from "drizzle-orm/pg-core";
 import { goalTable, usersTable } from "@/db/schema";
 
 export const subgoalTable = pgTable("subgoaltable", {
-  id: integer("id").primaryKey(),
+  id: bigint("id", { mode: "number" }).primaryKey(),
 
   name: varchar("name", { length: 255 }).notNull(),
   description: varchar("description", { length: 2000 }),
@@ -20,12 +21,11 @@ export const subgoalTable = pgTable("subgoaltable", {
     .notNull()
     .references(() => usersTable.id),
 
-  goal_id: integer("goal_id")
+  goal_id: bigint("goal_id", { mode: "number" })
     .notNull()
     .references(() => goalTable.id),
   isdone:boolean().default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  endDate: timestamp("created_at").defaultNow(),
 });
 
 export type Subgoal = typeof subgoalTable.$inferSelect;

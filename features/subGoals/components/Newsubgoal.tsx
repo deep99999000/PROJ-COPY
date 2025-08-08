@@ -11,6 +11,7 @@ import useUser from "@/store/useUser";
 import { Label } from "@radix-ui/react-label";
 import { Target, Sparkles, Calendar, Tag } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
+import { generateUniqueId } from "@/features/goals/components/Gneratenub=mver";
 
 interface Props {
   isOpen: boolean;
@@ -24,11 +25,12 @@ const NewSubGoalDialog: React.FC<Props> = ({ isOpen, setIsOpen, goal_id }) => {
   const { addSubgoal } = useSubgoal();
 
   const onSub = async (data: NewSubgoal) => {
-    addSubgoal(data, user, Number(goal_id));
+    const id = generateUniqueId();
+    addSubgoal(data, user, Number(goal_id),id);
     setIsOpen(false);
     await newSubGoalsAction({
       ...data,
-      id:Math.floor(Math.random() * 1_000_000),
+      id,
       user_id: user,
       goal_id: Number(goal_id),
     });
@@ -64,17 +66,17 @@ const NewSubGoalDialog: React.FC<Props> = ({ isOpen, setIsOpen, goal_id }) => {
               <Tag className="w-4 h-4 text-purple-500" />
               Category
             </Label>
-            {/* <Controller
-              name="category"
+            <Controller
+              name="status"
               control={control}
               render={({ field }) => (
                 <SelectComponent
                   onchangefunc={field.onChange}
                   deafultvalue={field.value || ""}
-                  allvalues={["Health", "Career", "Learning", "Personal", "Finance", "Coding"]}
+                  allvalues={["Not Started", "In Process", "Completed"]}
                 />
               )}
-            /> */}
+            /> 
           </div>
 
           <div className="space-y-2">
@@ -82,13 +84,13 @@ const NewSubGoalDialog: React.FC<Props> = ({ isOpen, setIsOpen, goal_id }) => {
               <Calendar className="w-4 h-4 text-green-500" />
               Target Date
             </Label>
-            {/* <Controller
+            <Controller
               name="endDate"
               control={control}
               render={({ field }) => (
                 <DateTimePicker label="endDate" setDate={field.onChange} date={field.value} />
               )}
-            /> */}
+            />
           </div>
         </div>
 

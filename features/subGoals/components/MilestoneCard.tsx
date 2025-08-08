@@ -1,19 +1,21 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { CheckCircle2, Clock, Circle, Check } from "lucide-react";
+import type { Todo } from "@/features/todo/todoSchema";
 
 type StatusType = "Completed" | "In Progress" | "Not Started";
 
-interface Subgoal {
+interface todo {
   title: string;
   completed: boolean;
 }
 
 interface MilestoneCardProps {
+  id: number;
   title: string;
   description: string;
   status: StatusType;
-  subgoals?: { title: string; completed: boolean | null }[] // Optional list of subgoals
+  todos:Todo[]
 }
 
 const statusConfig: Record<StatusType, {
@@ -46,7 +48,7 @@ export const MilestoneCard = ({
   title,
   description,
   status,
-  subgoals = [],
+  todos,
 }: MilestoneCardProps) => {
   const config = statusConfig[status];
 
@@ -81,18 +83,18 @@ export const MilestoneCard = ({
         </span>
       </div>
 
-      {/* Subgoals List */}
-      {subgoals.length > 0 && (
+      {/* todos List */}
+      {todos.length > 0 && (
         <div className="space-y-2 mt-2">
-          {subgoals.map((subgoal, index) => (
+          {todos.map((todo, index) => (
             <div
               key={index}
               className={cn(
                 "flex items-center gap-2 text-sm",
-                subgoal.completed ? "text-slate-700" : "text-slate-500"
+                todo.isDone? "text-slate-700" : "text-slate-500"
               )}
             >
-              {subgoal.completed ? (
+              {todo.isDone ? (
                 <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
               ) : (
                 <div className="w-4 h-4 border border-slate-300 rounded-full flex items-center justify-center">
@@ -102,21 +104,21 @@ export const MilestoneCard = ({
               <span
                 className={cn(
                   "transition-all duration-200",
-                  subgoal.completed
+                  todo.isDone
                     ? "line-through opacity-70"
                     : "font-medium"
                 )}
               >
-                {subgoal.title}
+                {todo.name}
               </span>
             </div>
           ))}
         </div>
       )}
 
-      {/* Optional: Add "No subgoals" placeholder if needed */}
-      {subgoals.length === 0 && (
-        <p className="text-xs text-slate-400 italic">No subgoals defined</p>
+      {/* Optional: Add "No todos" placeholder if needed */}
+      {todos.length === 0 && (
+        <p className="text-xs text-slate-400 italic">No todos defined</p>
       )}
     </div>
   );
