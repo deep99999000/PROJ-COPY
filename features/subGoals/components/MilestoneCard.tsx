@@ -54,11 +54,11 @@ export function MilestoneCard({
   title,
   description,
   status,
-  hrefBase = "/milestone",
+  hrefBase = "./subgoals",
   className,
 }: MilestoneCardProps) {
   const theme = statusConfig[status]
-  const href = `${hrefBase}/${id}`
+  const href = `${hrefBase}`
 
   return (
     <Link

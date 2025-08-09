@@ -13,13 +13,16 @@ import useUser from "@/store/useUser";
 import { newtodoaction } from "@/features/todo/todoaction";
 import type { NewTodo } from "@/features/todo/todoSchema";
 import { Sparkles, FileText, Tag, Flag, Calendar, Target } from "lucide-react";
+import { log } from "console";
 
 interface NewTodoDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+
+  defaultSubgoalId?: number | null;
 }
 
-export default function NewTodoDialog({ isOpen, setIsOpen }: NewTodoDialogProps) {
+export default function NewTodoDialog({ isOpen, setIsOpen,defaultSubgoalId = null  }: NewTodoDialogProps) {
   const userId = useUser((s) => s.user);
   const { addTodo } = useTodo();
 
@@ -38,12 +41,14 @@ export default function NewTodoDialog({ isOpen, setIsOpen }: NewTodoDialogProps)
       startDate: null,
       endDate: null,
       goal_id: null,
-      subgoal_id: null,
+      subgoal_id: defaultSubgoalId,
     },
   });
 
   // Form Submit Handler
   const onSubmit = async (data: NewTodo) => {
+    console.log("data",data);
+    
     addTodo(data, userId ?? 0);
     reset();
     setIsOpen(false);

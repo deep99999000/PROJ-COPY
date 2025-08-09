@@ -1,4 +1,3 @@
-// app/(productivity)/goals/[id]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -72,9 +71,9 @@ const Page = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <div className="container mx-auto px-4 py-3 max-w-5xl">
         {/* Back Button */}
-        <div className="mb-6">
+        <div className="mb-4">
           <Link
             href="/goals"
             className="inline-flex items-center text-slate-600 hover:text-slate-900 group transition-colors"
@@ -218,7 +217,7 @@ const Page = () => {
                     title={subgoal.name}
                     description={subgoal.description}
                     status={status}
-                    hrefBase={`/goals/${goalId}/milestone`}
+                    hrefBase={`/subgoals/${goalId}`}
                     className="hover:shadow-lg transition-shadow duration-200"
                   />
                 );
