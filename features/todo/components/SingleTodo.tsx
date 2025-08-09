@@ -79,7 +79,7 @@ export const SingleTodo = ({ todo }: { todo: Todo }) => {
               {name}
             </h3>
             {description && (
-              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              <p className="mt-0 text-sm leading-relaxed text-muted-foreground">
                 {description}
               </p>
             )}
@@ -112,7 +112,7 @@ export const SingleTodo = ({ todo }: { todo: Todo }) => {
         </div>
 
         {/* === Metadata === */}
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="mt-2 flex flex-wrap items-center gap-2">
           {/* Priority */}
           {priority && priority !== "None" && (
             <Badge

@@ -4,21 +4,19 @@ import { ShowDate } from '@/components/ShowDate';
 import { useSubgoal } from '@/features/subGoals/subgoalStore';
 import { SingleTodo } from '@/features/todo/components/SingleTodo';
 import { useTodo } from '@/features/todo/todostore';
-import { TrendingUp, Calendar, ListChecks, ChevronLeft, Target, Edit, Pencil } from 'lucide-react';
+import { TrendingUp, Calendar, ListChecks, ChevronLeft, Target, Pencil, Plus } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import NewTodoDialog from '@/features/todo/components/NewTodo';
-import NewGoalButton from '@/features/goals/components/NewGoalButton';
 import NewTaskButton from '@/features/todo/components/NewTodoButton';
 
 const Page = () => {
-  const { id } = useParams(); // goal_id from the URL
+  const { id } = useParams();
   const { subgoals } = useSubgoal();
   const { todos } = useTodo();
 
-  const subgoal = subgoals.find((sg) => sg.goal_id === Number(id));
+  const subgoal = subgoals.find((sg) => sg.id === Number(id));
 
   if (!subgoal) {
     return (
@@ -33,12 +31,15 @@ const Page = () => {
 
   const { name, description, isdone, status, endDate } = subgoal;
   const tasks = todos.filter((t) => t.subgoal_id === subgoal.id);
+  const completionPercentage = tasks.length > 0 
+    ? Math.round((tasks.filter(t => t.isDone).length / tasks.length) * 100)
+    : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Back Button */}
-        <div className="mb-6">
+        <div className="mb-8">
           <Link
             href={`/goals/${subgoal.goal_id}`}
             className="inline-flex items-center text-slate-600 hover:text-slate-900 group transition-colors"
@@ -51,110 +52,141 @@ const Page = () => {
         </div>
 
         {/* Subgoal Header */}
-        <div className="bg-white rounded-3xl shadow-lg border border-slate-200 p-8 mb-8">
-          <div className="flex justify-between items-start">
-            <div className="flex items-start gap-5 mb-6">
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg">
-                <Target className="w-8 h-8 text-white" />
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md">
+                <Target className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-slate-900 leading-tight">
+                <h1 className="text-3xl font-bold text-slate-900 leading-tight">
                   {name}
                 </h1>
                 {description && (
-                  <p className="text-slate-600 text-lg mt-1">{description}</p>
+                  <p className="text-slate-500 mt-2 max-w-2xl">{description}</p>
                 )}
               </div>
             </div>
-            {/* Edit Button */}
-           <Button
+            
+            <Button
               asChild
+              variant="outline"
               size="lg"
-              className="px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+              className="rounded-lg shadow-sm hover:shadow-md transition-all border-slate-200 hover:border-slate-300"
             >
-              <Link href={`/subggoals/${id}/edit`} className="flex items-center gap-3">
-                <Pencil className="w-5 h-5" />
-                Edit Goal
+              <Link href={`/subggoals/${id}/edit`} className="flex items-center gap-2">
+                <Pencil className="w-4 h-4" />
+                <span>Edit</span>
               </Link>
             </Button>
           </div>
+        </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Status */}
-            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-purple-100">
-                  <TrendingUp className="w-5 h-5 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-slate-600 text-sm font-medium">Status</p>
-                  <p className="text-base font-semibold text-slate-900">
-                    {isdone ? "Completed" : status || "Not Started"}
-                  </p>
-                </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          {/* Status Card */}
+          <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${
+                isdone ? 'bg-green-100' : status === 'In Progress' ? 'bg-yellow-100' : 'bg-purple-100'
+              }`}>
+                <TrendingUp className={`w-5 h-5 ${
+                  isdone ? 'text-green-600' : status === 'In Progress' ? 'text-yellow-600' : 'text-purple-600'
+                }`} />
+              </div>
+              <div>
+                <p className="text-slate-500 text-sm">Status</p>
+                <p className="text-base font-semibold text-slate-900">
+                  {isdone ? "Completed" : status || "Not Started"}
+                </p>
               </div>
             </div>
+          </div>
 
-            {/* End Date */}
-            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-100">
-                  <Calendar className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-slate-600 text-sm font-medium">End Date</p>
-                  <p className="text-base font-semibold text-slate-900">
-                    {endDate ? <ShowDate date={endDate} /> : "Not set"}
-                  </p>
-                </div>
+          {/* End Date Card */}
+          <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-blue-100">
+                <Calendar className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-slate-500 text-sm">End Date</p>
+                <p className="text-base font-semibold text-slate-900">
+                  {endDate ? <ShowDate date={endDate} /> : "Not set"}
+                </p>
               </div>
             </div>
+          </div>
 
-            {/* Completion */}
-            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-green-100">
-                  <ListChecks className="w-5 h-5 text-green-600" />
+          {/* Completion Card */}
+          <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-emerald-100">
+                <ListChecks className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div className="flex-1">
+                <div className="flex justify-between items-center mb-1">
+                  <p className="text-slate-500 text-sm">Progress</p>
+                  <span className="text-sm font-medium text-slate-700">
+                    {completionPercentage}%
+                  </span>
                 </div>
-                <div>
-                  <p className="text-slate-600 text-sm font-medium">Tasks</p>
-                  <p className="text-base font-semibold text-slate-900">
-                    {tasks.filter((t) => t.isDone).length} / {tasks.length} completed
-                  </p>
+                <div className="w-full bg-slate-100 rounded-full h-2">
+                  <div 
+                    className="bg-emerald-500 h-2 rounded-full" 
+                    style={{ width: `${completionPercentage}%` }}
+                  ></div>
                 </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  {tasks.filter((t) => t.isDone).length} of {tasks.length} tasks
+                </p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Tasks Section */}
-        <div className="bg-white rounded-3xl shadow-lg border border-slate-200 p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-2 h-6 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full"></div>
-            <h2 className="text-3xl font-bold text-slate-900">Tasks</h2>
-            <span className="text-slate-500 text-lg">
-              ({tasks.length} total)
-            </span>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-6 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full"></div>
+              <h2 className="text-2xl font-bold text-slate-900">Tasks</h2>
+              <span className="text-slate-500 text-sm bg-slate-100 px-2 py-1 rounded-md">
+                {tasks.length}
+              </span>
+            </div>
+            
+            <NewTaskButton subgoal_id={Number(id)} >
+              <Button size="sm" className="gap-2">
+                <Plus className="w-4 h-4" />
+                <span>New Task</span>
+              </Button>
+            </NewTaskButton>
           </div>
-                <NewTaskButton />
+
           {tasks.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {tasks.map((t) => (
                 <SingleTodo key={t.id} todo={t} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <ListChecks className="w-8 h-8 text-slate-400" />
+            <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-xl">
+              <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ListChecks className="w-6 h-6 text-blue-500" />
               </div>
-              <h3 className="text-lg font-medium text-slate-700">
+              <h3 className="text-lg font-medium text-slate-800 mb-1">
                 No tasks yet
               </h3>
-              <p className="text-slate-500 mt-1">
-                Start by adding your first task for this milestone.
+              <p className="text-slate-500 mb-4 max-w-md mx-auto">
+                Add your first task to start making progress on this milestone.
               </p>
+              <NewTaskButton subgoal_id={Number(id)}>
+                <Button size="sm" className="gap-2">
+                  <Plus className="w-4 h-4" />
+                  <span>Create Task</span>
+                </Button>
+              </NewTaskButton>
             </div>
           )}
         </div>

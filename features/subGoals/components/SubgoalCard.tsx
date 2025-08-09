@@ -1,8 +1,7 @@
 "use client";
 
 import { ShowDate } from '@/components/ShowDate';
-import type { Subgoal } from '@/features/subGoals/subgoalSchema'; // Make sure this type exists
-
+import type { Subgoal } from '@/features/subGoals/subGoalschema'; 
 export default function SubgoalCard({ subgoal }: { subgoal: Subgoal }) {
   return (
     <div className="border p-4 rounded-lg shadow-sm bg-white hover:shadow transition-shadow duration-200">

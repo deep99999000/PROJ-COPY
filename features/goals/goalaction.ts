@@ -1,8 +1,8 @@
 "use server"
-import { and, eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import {Goal, goalTable, type NewGoal} from "@/features/goals/goalSchema"
-import { subgoalTable } from "@/db/schema";
+import { subgoalTable, todoTable } from "@/db/schema";
 import type { NewSubgoal } from "@/features/subGoals/subGoalschema";
 //get all users goal
 export const getAllUserGoals = async (user_id: number) => {
@@ -63,15 +63,38 @@ export const newSubGoalsAction = async(NewSubgoal: NewSubgoal) => {
     console.log(error);
   }
 };
-export const DeleteGoalsAction = async(id:number) => {
+
+export const DeleteGoalsAction = async (id: number) => {
   try {
+    // 1. Find all subgoal IDs for this goal
+    const subgoals = await db
+      .select({ id: subgoalTable.id })
+      .from(subgoalTable)
+      .where(eq(subgoalTable.goal_id, id));
+
+    const subgoalIds = subgoals.map(sg => sg.id);
+
+    if (subgoalIds.length > 0) {
+      // 2. Delete all todos linked to these subgoals
+      await db
+        .delete(todoTable)
+        .where(inArray(todoTable.subgoal_id, subgoalIds));
+
+      // 3. Delete all subgoals for this goal
+      await db
+        .delete(subgoalTable)
+        .where(eq(subgoalTable.goal_id, id));
+    }
+
+    // 4. Delete the goal
     const deletedGoal = await db
       .delete(goalTable)
-      .where(eq(goalTable.id,id))
+      .where(eq(goalTable.id, id))
       .returning();
-    console.log(deletedGoal);
+
     return deletedGoal;
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    throw error;
   }
 };

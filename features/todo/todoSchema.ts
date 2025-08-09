@@ -26,7 +26,7 @@ export const todoTable = pgTable("todotable", {
 
   // Foreign keys
   goal_id:  bigint("goal_id", { mode: "number" }).references(() => goalTable.id),
-  subgoal_id:  bigint("subGoal_id", { mode: "number" }).references(() => subgoalTable.id),
+  subgoal_id:  bigint("subgoal_id", { mode: "number" }).references(() => subgoalTable.id),
 });
 
 // types

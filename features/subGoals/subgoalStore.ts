@@ -19,10 +19,11 @@ export const useSubgoal = create<SubgoalState>()(
 
       setSubgoals: (newSubgoals) => set({ subgoals: newSubgoals }),
 
-      addSubgoal: (newSubgoal, user_id, goal_id) =>
+      addSubgoal: (newSubgoal, user_id, goal_id,id) =>
         set((state) => {
           const fullSubgoal = {
             ...newSubgoal,
+            id,
             user_id,
             goal_id,
             isDone: false,

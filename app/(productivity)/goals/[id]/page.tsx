@@ -217,7 +217,7 @@ const Page = () => {
                     title={subgoal.name}
                     description={subgoal.description}
                     status={status}
-                    hrefBase={`/subgoals/${goalId}`}
+                    hrefBase={`/subgoals/${subgoal.id}`}
                     className="hover:shadow-lg transition-shadow duration-200"
                   />
                 );
