@@ -1,71 +1,78 @@
-"use client"
+"use client";
 
-import React from "react"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
-import { CheckCircle2, Clock, Circle, ChevronRight, Flag } from "lucide-react"
-
-type StatusType = "Completed" | "In Progress" | "Not Started"
+import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { ChevronRight, Flag, Edit, Trash2, CheckCircle, Circle } from "lucide-react";
+import { statusConfig, StatusType } from "@/features/subGoals/components/StatusConfig";
+import { useTodo } from "@/features/todo/todostore";
 
 interface MilestoneCardProps {
-  id: number
-  title: string
-  description: string
-  status: StatusType
-  hrefBase?: string
-  className?: string
-}
-
-const statusConfig: Record<
-  StatusType,
-  {
-    badgeBg: string
-    badgeText: string
-    badgeBorder: string
-    icon: React.ReactNode
-    ring: string
-  }
-> = {
-  Completed: {
-    badgeBg: "bg-emerald-50",
-    badgeText: "text-emerald-700",
-    badgeBorder: "border-emerald-200",
-    icon: <CheckCircle2 className="w-4 h-4 text-emerald-600" />,
-    ring: "ring-emerald-100",
-  },
-  "In Progress": {
-    badgeBg: "bg-amber-50",
-    badgeText: "text-amber-700",
-    badgeBorder: "border-amber-200",
-    icon: <Clock className="w-4 h-4 text-amber-600" />,
-    ring: "ring-amber-100",
-  },
-  "Not Started": {
-    badgeBg: "bg-slate-50",
-    badgeText: "text-slate-700",
-    badgeBorder: "border-slate-200",
-    icon: <Circle className="w-4 h-4 text-slate-500" />,
-    ring: "ring-slate-100",
-  },
+  id: number;
+  title: string;
+  description: string;
+  status?: string;
+  hrefBase?: string;
+  className?: string;
 }
 
 export function MilestoneCard({
   id,
   title,
   description,
-  status,
-  hrefBase = "./subgoals",
+  status = "Not Started",
+  hrefBase = "/subgoals",
   className,
 }: MilestoneCardProps) {
-  const theme = statusConfig[status]
-  const href = `${hrefBase}`
+  const router = useRouter();
+  const { todos } = useTodo();
+
+  // ✅ Filter todos for this subgoal
+  const subgoalTodos = todos.filter((todo) => todo.subgoal_id === id);
+
+  // ✅ Determine status automatically
+  let calculatedStatus: StatusType;
+  if (subgoalTodos.length === 0) {
+    calculatedStatus = "Not Started";
+  } else if (subgoalTodos.every((todo) => todo.isDone)) {
+    calculatedStatus = "Completed";
+  } else {
+    calculatedStatus = "In Progress";
+  }
+
+  const theme = statusConfig[calculatedStatus];
+  const href = `${hrefBase}/${id}`;
+
+  // Toggle completion (placeholder)
+  const handleToggleComplete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // your toggle complete logic here
+  };
+
+  // Delete subgoal (placeholder)
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (confirm("Are you sure you want to delete this milestone?")) {
+      // your delete logic here
+    }
+  };
+
+  // Navigate to edit page
+  const handleEdit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    router.push(`${href}/edit`);
+  };
 
   return (
     <Link
       href={href}
       aria-label={`Open milestone ${title}`}
       className={cn(
-        "block group focus:outline-none",
+        "block group focus:outline-none relative",
         "rounded-2xl border bg-white transition-all duration-200",
         "hover:shadow-lg hover:-translate-y-0.5",
         "focus-visible:ring-2 focus-visible:ring-offset-2",
@@ -73,6 +80,43 @@ export function MilestoneCard({
         className
       )}
     >
+      {/* Hover Action Buttons (no nested <a> anymore) */}
+      <div className="absolute -top-2 -right-2 flex opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200 z-10">
+        <button
+          onClick={handleToggleComplete}
+          className={cn(
+            "p-1.5 rounded-full text-xs border shadow-sm bg-white hover:bg-slate-50",
+            "text-slate-600 hover:text-green-600 border-slate-300 hover:border-green-400"
+          )}
+          aria-label={
+            calculatedStatus === "Completed" ? "Mark as incomplete" : "Mark as complete"
+          }
+        >
+          {calculatedStatus === "Completed" ? (
+            <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+          ) : (
+            <Circle className="w-3.5 h-3.5" />
+          )}
+        </button>
+
+        <button
+          onClick={handleEdit}
+          className="p-1.5 ml-1 rounded-full text-xs border shadow-sm bg-white hover:bg-blue-50 text-slate-600 hover:text-blue-600 border-slate-300 hover:border-blue-400"
+          aria-label="Edit milestone"
+        >
+          <Edit className="w-3.5 h-3.5" />
+        </button>
+
+        <button
+          onClick={handleDelete}
+          className="p-1.5 ml-1 rounded-full text-xs border shadow-sm bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 border-slate-300 hover:border-red-400"
+          aria-label="Delete milestone"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {/* Card Content */}
       <div className="p-5">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
@@ -100,7 +144,7 @@ export function MilestoneCard({
             )}
           >
             {theme.icon}
-            <span>{status}</span>
+            <span>{calculatedStatus}</span>
           </span>
         </div>
 
@@ -111,5 +155,5 @@ export function MilestoneCard({
         </div>
       </div>
     </Link>
-  )
+  );
 }

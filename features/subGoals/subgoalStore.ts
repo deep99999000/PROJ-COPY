@@ -1,13 +1,14 @@
 // stores/subgoalStore.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Subgoal,NewSubgoal } from "@/features/subGoals/subGoalschema";
+import type { Subgoal, NewSubgoal } from "@/features/subGoals/subGoalschema";
 
 interface SubgoalState {
   subgoals: Subgoal[];
   setSubgoals: (newSubgoals: Subgoal[]) => void;
-  addSubgoal: (newSubgoal: NewSubgoal, user_id: number, goal_id: number,id:number) => void;
+  addSubgoal: (newSubgoal: NewSubgoal, user_id: number, goal_id: number, id: number) => void;
   updateSubgoal: (updated: Subgoal) => void;
+  updateSubgoalStatus: (id: number, status: string) => void;
   deleteSubgoal: (id: number) => void;
   toggleSubgoal: (id: number) => void;
 }
@@ -19,14 +20,15 @@ export const useSubgoal = create<SubgoalState>()(
 
       setSubgoals: (newSubgoals) => set({ subgoals: newSubgoals }),
 
-      addSubgoal: (newSubgoal, user_id, goal_id,id) =>
+      addSubgoal: (newSubgoal, user_id, goal_id, id) =>
         set((state) => {
           const fullSubgoal = {
             ...newSubgoal,
             id,
             user_id,
             goal_id,
-            isDone: false,
+            isdone: false,
+            status: "Not Started",
             createdAt: new Date(),
             updatedAt: new Date(),
           } as Subgoal;
@@ -38,6 +40,13 @@ export const useSubgoal = create<SubgoalState>()(
         set((state) => ({
           subgoals: state.subgoals.map((sg) =>
             sg.id === updated.id ? { ...updated, updatedAt: new Date() } : sg
+          ),
+        })),
+
+      updateSubgoalStatus: (id, status) =>
+        set((state) => ({
+          subgoals: state.subgoals.map((sg) =>
+            sg.id === id ? { ...sg, status, updatedAt: new Date() } : sg
           ),
         })),
 
@@ -53,8 +62,6 @@ export const useSubgoal = create<SubgoalState>()(
           ),
         })),
     }),
-    {
-      name: "subgoal-store",
-    }
+    { name: "subgoal-store" }
   )
 );

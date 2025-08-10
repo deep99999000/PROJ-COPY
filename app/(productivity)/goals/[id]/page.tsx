@@ -1,3 +1,4 @@
+// @/app/goals/[id]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -5,7 +6,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useGoal } from "@/features/goals/GoalStore";
 import { useSubgoal } from "@/features/subGoals/subgoalStore";
-import { getaallsubgoal } from "@/features/goals/goalaction";
+import { getaallsubgoal, toggleGoal } from "@/features/goals/goalaction";
 import { ShowDate } from "@/components/ShowDate";
 import { MilestoneCard } from "@/features/subGoals/components/MilestoneCard";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ import type { Goal } from "@/features/goals/goalSchema";
 import { useDialog } from "@/hooks/usedialog";
 import NewSubGoalDialog from "@/features/subGoals/components/Newsubgoal";
 import type { Subgoal } from "@/features/subGoals/subGoalschema";
+
 const Page = () => {
   const params = useParams();
   const goalId = Number(params?.id);
@@ -29,8 +31,10 @@ const Page = () => {
   const { subgoals, setSubgoals } = useSubgoal();
   const [singleGoal, setSingleGoal] = useState<Goal | null>(null);
   const { open, isOpen, close } = useDialog();
+
+  const {updateGoalStatus } = useGoal();
   
-  // Filter and enhance subgoals with derived status and description
+
   const goalSubgoals = subgoals
     .filter((sg): sg is Subgoal => sg.goal_id === goalId)
     .map((sg) => ({
@@ -38,8 +42,8 @@ const Page = () => {
       description: sg.description || "",
     }));
 
-  // Calculate overall completion (based on isdone)
-  const completedCount = goalSubgoals.filter((sg) => sg.isdone === true).length;
+  const completedCount = goalSubgoals.filter((sg) => sg.status === "Completed").length;
+
   useEffect(() => {
     const currentGoal = allGoals.find((g) => g.id === goalId) || null;
     setSingleGoal(currentGoal);
@@ -48,6 +52,26 @@ const Page = () => {
       getaallsubgoal(goalId).then(setSubgoals);
     }
   }, [allGoals, goalId, subgoals.length, setSubgoals]);
+
+
+useEffect(() => {
+  if (!singleGoal) return;
+
+  let newStatus: Goal["status"];
+
+  if (goalSubgoals.length === 0) {
+    newStatus = "Not Started";
+  } else if (completedCount === goalSubgoals.length) {
+    newStatus = "Completed";
+  } else {
+    newStatus = "In Progress";
+  }
+
+  if (singleGoal.status !== newStatus) {
+    updateGoalStatus(goalId, newStatus);
+    toggleGoal(goalId, newStatus)
+  }
+}, [goalSubgoals.length, completedCount, singleGoal, goalId, updateGoalStatus]);
 
   const categoryColors: Record<string, string> = {
     Health: "bg-green-50 text-green-700 border-green-200",
@@ -96,7 +120,7 @@ const Page = () => {
                 <div>
                   <h1 className="text-4xl font-bold text-slate-900 leading-tight">
                     {singleGoal.name}
-                  </h1>goalStatus
+                  </h1>
                   <p className="text-slate-600 text-lg mt-1">
                     {singleGoal.description || "No description provided."}
                   </p>
@@ -131,7 +155,6 @@ const Page = () => {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            {/* Target Date */}
             <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-blue-100">
@@ -146,7 +169,6 @@ const Page = () => {
               </div>
             </div>
 
-            {/* Status */}
             <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-purple-100">
@@ -159,7 +181,6 @@ const Page = () => {
               </div>
             </div>
 
-            {/* Completion */}
             <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-green-100">
@@ -200,24 +221,15 @@ const Page = () => {
           {/* Milestone List */}
           {goalSubgoals.length > 0 ? (
             <div className="space-y-5">
-              {goalSubgoals.map((subgoal,index) => {
-                const status: "Completed" | "In Progress" | "Not Started" =
-                  subgoal.isdone ? "Completed" : "Not Started";
-
-                // Simulate subgoal checklist
-                // const subgoalList = [
-                //   { title: `Complete ${subgoal.name.toLowerCase()}`, completed: subgoal.isdone },
-                //   { title: "Review outcome", completed: false },
-                //   { title: "Mark as final", completed: false },
-                // ];
+              {goalSubgoals.map((subgoal) => {
                 return (
                   <MilestoneCard
-                    key={index}
+                    key={subgoal.id} // ✅ Use `id`, not `index`
                     id={subgoal.id}
                     title={subgoal.name}
                     description={subgoal.description}
-                    status={status}
-                    hrefBase={`/subgoals/${subgoal.id}`}
+                    status={subgoal.status}
+                    hrefBase={`/subgoals`}
                     className="hover:shadow-lg transition-shadow duration-200"
                   />
                 );

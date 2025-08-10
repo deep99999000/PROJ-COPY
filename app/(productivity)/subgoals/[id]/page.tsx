@@ -1,22 +1,57 @@
 "use client";
 
-import { ShowDate } from '@/components/ShowDate';
-import { useSubgoal } from '@/features/subGoals/subgoalStore';
-import { SingleTodo } from '@/features/todo/components/SingleTodo';
-import { useTodo } from '@/features/todo/todostore';
-import { TrendingUp, Calendar, ListChecks, ChevronLeft, Target, Pencil, Plus } from 'lucide-react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import NewTaskButton from '@/features/todo/components/NewTodoButton';
+import { ShowDate } from "@/components/ShowDate";
+import { useSubgoal } from "@/features/subGoals/subgoalStore";
+import { SingleTodo } from "@/features/todo/components/SingleTodo";
+import { useTodo } from "@/features/todo/todostore";
+import {
+  TrendingUp,
+  Calendar,
+  ListChecks,
+  ChevronLeft,
+  Target,
+  Pencil,
+  Plus,
+} from "lucide-react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import React, { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import NewTaskButton from "@/features/todo/components/NewTodoButton";
 
 const Page = () => {
-  const { id } = useParams();
-  const { subgoals } = useSubgoal();
+ const { id } = useParams();
+  const { subgoals, updateSubgoalStatus } = useSubgoal();
   const { todos } = useTodo();
 
   const subgoal = subgoals.find((sg) => sg.id === Number(id));
+
+  const tasks = subgoal
+    ? todos.filter((t) => t.subgoal_id === subgoal.id)
+    : [];
+
+  // Auto-calculate status based on tasks
+  let computedStatus: string;
+  if (!subgoal || tasks.length === 0) {
+    computedStatus = "Not Started";
+  } else if (tasks.every((t) => t.isDone)) {
+    computedStatus = "Completed";
+  } else {
+    computedStatus = "In Progress";
+  }
+
+  const completionPercentage = tasks.length
+    ? Math.round(
+        (tasks.filter((t) => t.isDone).length / tasks.length) * 100
+      )
+    : 0;
+
+  // ✅ Hook is always called, even if subgoal is undefined
+  useEffect(() => {
+    if (subgoal && subgoal.status !== computedStatus) {
+      updateSubgoalStatus(subgoal.id, computedStatus);
+    }
+  }, [computedStatus, subgoal, updateSubgoalStatus]);
 
   if (!subgoal) {
     return (
@@ -28,13 +63,7 @@ const Page = () => {
       </div>
     );
   }
-
-  const { name, description, isdone, status, endDate } = subgoal;
-  const tasks = todos.filter((t) => t.subgoal_id === subgoal.id);
-  const completionPercentage = tasks.length > 0 
-    ? Math.round((tasks.filter(t => t.isDone).length / tasks.length) * 100)
-    : 0;
-
+const { name, description, endDate, status, isdone } = subgoal;
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -59,22 +88,25 @@ const Page = () => {
                 <Target className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-slate-900 leading-tight">
+                {name &&  <h1 className="text-3xl font-bold text-slate-900 leading-tight">
                   {name}
-                </h1>
+                </h1>}
                 {description && (
                   <p className="text-slate-500 mt-2 max-w-2xl">{description}</p>
                 )}
               </div>
             </div>
-            
+
             <Button
               asChild
               variant="outline"
               size="lg"
               className="rounded-lg shadow-sm hover:shadow-md transition-all border-slate-200 hover:border-slate-300"
             >
-              <Link href={`/subggoals/${id}/edit`} className="flex items-center gap-2">
+              <Link
+                href={`/subggoals/${id}/edit`}
+                className="flex items-center gap-2"
+              >
                 <Pencil className="w-4 h-4" />
                 <span>Edit</span>
               </Link>
@@ -87,17 +119,29 @@ const Page = () => {
           {/* Status Card */}
           <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${
-                isdone ? 'bg-green-100' : status === 'In Progress' ? 'bg-yellow-100' : 'bg-purple-100'
-              }`}>
-                <TrendingUp className={`w-5 h-5 ${
-                  isdone ? 'text-green-600' : status === 'In Progress' ? 'text-yellow-600' : 'text-purple-600'
-                }`} />
+              <div
+                className={`p-2 rounded-lg ${
+                  isdone
+                    ? "bg-green-100"
+                    : status === "In Progress"
+                    ? "bg-yellow-100"
+                    : "bg-purple-100"
+                }`}
+              >
+                <TrendingUp
+                  className={`w-5 h-5 ${
+                    isdone
+                      ? "text-green-600"
+                      : status === "In Progress"
+                      ? "text-yellow-600"
+                      : "text-purple-600"
+                  }`}
+                />
               </div>
               <div>
                 <p className="text-slate-500 text-sm">Status</p>
                 <p className="text-base font-semibold text-slate-900">
-                  {isdone ? "Completed" : status || "Not Started"}
+                  {computedStatus}
                 </p>
               </div>
             </div>
@@ -132,8 +176,8 @@ const Page = () => {
                   </span>
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-2">
-                  <div 
-                    className="bg-emerald-500 h-2 rounded-full" 
+                  <div
+                    className="bg-emerald-500 h-2 rounded-full"
                     style={{ width: `${completionPercentage}%` }}
                   ></div>
                 </div>
@@ -155,8 +199,8 @@ const Page = () => {
                 {tasks.length}
               </span>
             </div>
-            
-            <NewTaskButton subgoal_id={Number(id)} >
+
+            <NewTaskButton subgoal_id={Number(id)}>
               <Button size="sm" className="gap-2">
                 <Plus className="w-4 h-4" />
                 <span>New Task</span>
