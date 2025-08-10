@@ -20,13 +20,21 @@ const NewGoalDialog = ({
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
 }) => {
-  const { register, control, handleSubmit, reset } = useForm<NewGoal>();
+  const { register, control, handleSubmit, reset } = useForm<NewGoal>({
+    defaultValues: {
+      name: "",
+      description: "",
+      category: "Personal",
+      status: "Not Started",
+    },
+  });
   const { user } = useUser();
   const { addGoal } = useGoal();
 
   // Form Submit Handler
   const onSub = async (data: NewGoal) => {
     const id = generateUniqueId();
+console.log("Creating new goal with ID:",id);
 
     // Add to local state
     addGoal({

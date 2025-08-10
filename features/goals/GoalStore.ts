@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Goal, NewGoal } from "@/features/goals/goalSchema";
-import { useSubgoal } from "@/features/subGoals/subgoalStore";
 
+// Define the store type
 export type GoalStore = {
   allGoals: Goal[];
   setGoal: (newGoals: Goal[]) => void;
@@ -10,6 +10,7 @@ export type GoalStore = {
   deleteGoal: (id: number) => void;
   clearGoals: () => void;
   getGoalByIndex: (index: number) => Goal | undefined;
+  updateGoalStatus: (goalId: number, status: Goal["status"]) => void;
 };
 
 export const useGoal = create<GoalStore>()(
@@ -17,10 +18,10 @@ export const useGoal = create<GoalStore>()(
     (set, get) => ({
       allGoals: [],
 
-      // Set all goals (e.g. after server fetch)
+      // Replace all goals (e.g., after fetching from server)
       setGoal: (newGoals) => set({ allGoals: newGoals }),
 
-      // Optimistically add goal (temporary id)
+      // Add a new goal (optimistically with temporary structure)
       addGoal: (newGoal) =>
         set((state) => {
           const tempGoal: Goal = {
@@ -35,20 +36,28 @@ export const useGoal = create<GoalStore>()(
           };
         }),
 
-      // Delete goal by id
+      // Delete goal by ID
       deleteGoal: (id) =>
         set((state) => ({
           allGoals: state.allGoals.filter((goal) => goal.id !== id),
         })),
 
-      // Clear all cached goals
+      // Clear all goals
       clearGoals: () => set({ allGoals: [] }),
 
-      // ✅ Access goal by index
+      // Get goal by index
       getGoalByIndex: (index) => get().allGoals[index],
+
+      // Update the status of a specific goal
+      updateGoalStatus: (goalId, status) =>
+        set((state) => ({
+          allGoals: state.allGoals.map((goal) =>
+            goal.id === goalId ? { ...goal, status } : goal
+          ),
+        })),
     }),
     {
-      name: "goals-store",
+      name: "goals-store", // Local storage key
     }
   )
 );

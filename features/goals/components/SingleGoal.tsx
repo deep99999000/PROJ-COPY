@@ -1,16 +1,32 @@
+"use client";
+
 import { ShowDate } from '@/components/ShowDate';
 import { DeleteGoalsAction } from '@/features/goals/goalaction';
 import type { Goal } from '@/features/goals/goalSchema';
 import { useGoal } from '@/features/goals/GoalStore';
-import { de } from 'date-fns/locale';
+import { useSubgoal } from '@/features/subGoals/subgoalStore';
 import { Calendar, Clock, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 
-const GoalCard = ({ goal, onDelete }: { goal: Goal; onDelete?: (id: string) => void }) => {
-  const { id, name, description, category, endDate, status } = goal;
-  const { deleteGoal} = useGoal();
-  
+const GoalCard = ({ goal }: { goal: Goal }) => {
+  const { id, name, description, category, endDate } = goal;
+  const { deleteGoal } = useGoal();
+  const { subgoals } = useSubgoal();
+
+  // ✅ Filter subgoals for this goal
+  const goalSubgoals = subgoals.filter((sg) => sg.goal_id === id);
+
+  // ✅ Determine status from subgoals
+  let calculatedStatus: "Not Started" | "In Progress" | "Completed";
+  if (goalSubgoals.length === 0) {
+    calculatedStatus = "Not Started";
+  } else if (goalSubgoals.every((sg) => sg.status === "Completed")) {
+    calculatedStatus = "Completed";
+  } else {
+    calculatedStatus = "In Progress";
+  }
+
   const categoryStyles: Record<string, { bg: string; text: string; icon: string; cardBg: string; emoji: string }> = {
     Health: { bg: 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200', text: 'text-emerald-700', icon: 'bg-emerald-100', cardBg: 'bg-gradient-to-br from-emerald-50/70 via-white to-green-50/40', emoji: '🏃‍♂️' },
     Career: { bg: 'bg-gradient-to-r from-blue-50 to-sky-50 border-blue-200', text: 'text-blue-700', icon: 'bg-blue-100', cardBg: 'bg-gradient-to-br from-blue-50/70 via-white to-sky-50/40', emoji: '💼' },
@@ -31,10 +47,12 @@ const GoalCard = ({ goal, onDelete }: { goal: Goal; onDelete?: (id: string) => v
 
   const categoryStyle = getCategoryStyle(category || '');
   const isNearDeadline = endDate && new Date(endDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  const handleDelete = async() => {
-  deleteGoal(id);
-DeleteGoalsAction(id);
+
+  const handleDelete = async () => {
+    deleteGoal(id);
+    DeleteGoalsAction(id);
   };
+
   return (
     <div className="relative group">
       {/* Delete Button - visible only on hover */}
@@ -95,13 +113,11 @@ DeleteGoalsAction(id);
             )}
 
             {/* Status */}
-            {status && (
-              <span
-                className={`mt-2 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${categoryStyle.bg} ${categoryStyle.text} group-hover:shadow-sm`}
-              >
-                {status}
-              </span>
-            )}
+            <span
+              className={`mt-2 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${categoryStyle.bg} ${categoryStyle.text} group-hover:shadow-sm`}
+            >
+              {calculatedStatus}
+            </span>
           </div>
         </div>
       </Link>
