@@ -11,7 +11,6 @@ import { ShowDate } from "@/components/ShowDate";
 import { MilestoneCard } from "@/features/subGoals/components/MilestoneCard";
 import { Button } from "@/components/ui/button";
 import {
-  Pencil,
   Calendar,
   Target,
   ChevronLeft,
@@ -23,6 +22,7 @@ import type { Goal } from "@/features/goals/goalSchema";
 import { useDialog } from "@/hooks/usedialog";
 import NewSubGoalDialog from "@/features/subGoals/components/Newsubgoal";
 import type { Subgoal } from "@/features/subGoals/subGoalschema";
+import EditGoalButton from "@/features/goals/components/EditGoalButton";
 
 const Page = () => {
   const params = useParams();
@@ -141,16 +141,7 @@ useEffect(() => {
             </div>
 
             {/* Edit Button */}
-            <Button
-              asChild
-              size="lg"
-              className="px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
-            >
-              <Link href={`/goals/${singleGoal.id}/edit`} className="flex items-center gap-3">
-                <Pencil className="w-5 h-5" />
-                Edit Goal
-              </Link>
-            </Button>
+           <EditGoalButton data={singleGoal}/>
           </div>
 
           {/* Stats Grid */}
@@ -224,7 +215,7 @@ useEffect(() => {
               {goalSubgoals.map((subgoal) => {
                 return (
                   <MilestoneCard
-                    key={subgoal.id} // ✅ Use `id`, not `index`
+                    key={subgoal.id}
                     id={subgoal.id}
                     title={subgoal.name}
                     description={subgoal.description}

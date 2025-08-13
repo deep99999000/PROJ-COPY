@@ -11,6 +11,8 @@ interface SubgoalState {
   updateSubgoalStatus: (id: number, status: string) => void;
   deleteSubgoal: (id: number) => void;
   toggleSubgoal: (id: number) => void;
+  //edit subgoal
+  editSubgoal: (updated: Subgoal) => void;
 }
 
 export const useSubgoal = create<SubgoalState>()(
@@ -59,6 +61,12 @@ export const useSubgoal = create<SubgoalState>()(
         set((state) => ({
           subgoals: state.subgoals.map((sg) =>
             sg.id === id ? { ...sg, isdone: !sg.isdone, updatedAt: new Date() } : sg
+          ),
+        })),
+      editSubgoal: (updated) =>
+        set((state) => ({
+          subgoals: state.subgoals.map((sg) =>
+            sg.id === updated.id ? { ...updated, updatedAt: new Date() } : sg
           ),
         })),
     }),

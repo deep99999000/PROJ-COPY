@@ -10,7 +10,6 @@ import {
   ListChecks,
   ChevronLeft,
   Target,
-  Pencil,
   Plus,
 } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -18,6 +17,7 @@ import Link from "next/link";
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import NewTaskButton from "@/features/todo/components/NewTodoButton";
+import EditSubGoalButton from "@/features/subGoals/components/EditSubGoalButton";
 
 const Page = () => {
  const { id } = useParams();
@@ -97,20 +97,8 @@ const { name, description, endDate, status, isdone } = subgoal;
               </div>
             </div>
 
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="rounded-lg shadow-sm hover:shadow-md transition-all border-slate-200 hover:border-slate-300"
-            >
-              <Link
-                href={`/subggoals/${id}/edit`}
-                className="flex items-center gap-2"
-              >
-                <Pencil className="w-4 h-4" />
-                <span>Edit</span>
-              </Link>
-            </Button>
+           
+              <EditSubGoalButton data={subgoal} />
           </div>
         </div>
 

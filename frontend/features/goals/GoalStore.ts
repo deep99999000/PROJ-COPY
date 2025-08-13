@@ -11,6 +11,7 @@ export type GoalStore = {
   clearGoals: () => void;
   getGoalByIndex: (index: number) => Goal | undefined;
   updateGoalStatus: (goalId: number, status: Goal["status"]) => void;
+  editGoal: (updatedGoal: Goal) => void; // <-- Added
 };
 
 export const useGoal = create<GoalStore>()(
@@ -18,10 +19,8 @@ export const useGoal = create<GoalStore>()(
     (set, get) => ({
       allGoals: [],
 
-      // Replace all goals (e.g., after fetching from server)
       setGoal: (newGoals) => set({ allGoals: newGoals }),
 
-      // Add a new goal (optimistically with temporary structure)
       addGoal: (newGoal) =>
         set((state) => {
           const tempGoal: Goal = {
@@ -36,28 +35,32 @@ export const useGoal = create<GoalStore>()(
           };
         }),
 
-      // Delete goal by ID
       deleteGoal: (id) =>
         set((state) => ({
           allGoals: state.allGoals.filter((goal) => goal.id !== id),
         })),
 
-      // Clear all goals
       clearGoals: () => set({ allGoals: [] }),
 
-      // Get goal by index
       getGoalByIndex: (index) => get().allGoals[index],
 
-      // Update the status of a specific goal
       updateGoalStatus: (goalId, status) =>
         set((state) => ({
           allGoals: state.allGoals.map((goal) =>
             goal.id === goalId ? { ...goal, status } : goal
           ),
         })),
+
+      // Add editGoal implementation
+      editGoal: (updatedGoal) =>
+        set((state) => ({
+          allGoals: state.allGoals.map((goal) =>
+            goal.id === updatedGoal.id ? { ...goal, ...updatedGoal } : goal
+          ),
+        })),
     }),
     {
-      name: "goals-store", // Local storage key
+      name: "goals-store",
     }
   )
 );

@@ -3,7 +3,7 @@ import { and, eq, getTableColumns, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import {Goal, goalTable, type NewGoal} from "@/features/goals/goalSchema"
 import { subgoalTable, todoTable } from "@/db/schema";
-import type { NewSubgoal } from "@/features/subGoals/subGoalschema";
+import type { NewSubgoal, Subgoal } from "@/features/subGoals/subGoalschema";
 //get all users goal
 export const getAllUserGoals = async (user_id: number) => {
   try {
@@ -227,3 +227,33 @@ export const deleteGoal = async (id: number) => {
     throw error;
   }
 };
+
+//edit goal by only taking data json as goal type
+export const editGoalAction = async (updatedGoal: Goal) => {
+  try {
+    const editedGoal = await db
+      .update(goalTable)
+      .set(updatedGoal)
+      .where(eq(goalTable.id, updatedGoal.id))
+      .returning();
+    return editedGoal;
+  } catch (error) {
+    console.error("Error editing goal:", error);
+    throw error;
+  }
+}
+
+//edit subgoal by only taking data json as subgoal type
+export const editSubgoalAction = async (updatedSubgoal: Subgoal) => {
+  try {
+    const editedSubgoal = await db
+      .update(subgoalTable)
+      .set(updatedSubgoal)
+      .where(eq(subgoalTable.id, updatedSubgoal.id))
+      .returning();
+    return editedSubgoal;
+  } catch (error) {
+    console.error("Error editing subgoal:", error);
+    throw error;
+  }
+}
