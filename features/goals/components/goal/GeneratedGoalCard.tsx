@@ -1,10 +1,10 @@
-// components/GeneratedGoalCard.tsx
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Plus, Calendar } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
-import { GeneratedGoal } from "@/features/goals/components/GenerateGoalWithAIDialog";
+import { GeneratedGoal } from "@/features/goals/components/goal/GenerateGoalWithAIDialog";
 type GeneratedGoalCardProps = {
   goal: GeneratedGoal & { tempId: number };
   onEdit: (tempId: number, updates: Partial<GeneratedGoal>) => void;

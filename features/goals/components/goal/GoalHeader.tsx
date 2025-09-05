@@ -1,8 +1,8 @@
-import NewGoalButton from "@/features/goals/components/NewGoalButton";
+import NewGoalButton from "@/features/goals/components/goal/NewGoalButton";
 import React from "react";
 import { Sparkles } from "lucide-react"; // Perfect for AI/Smart generation
-import GenerateGoalWithAIDialog from "@/features/goals/components/GenerateGoalWithAIDialog";
-import GenerateGoalsWithAIDialog from "@/features/goals/components/GenerateGoalWithAIDialog";
+import GenerateGoalWithAIDialog from "@/features/goals/components/goal/GenerateGoalWithAIDialog";
+import GenerateGoalsWithAIDialog from "@/features/goals/components/goal/GenerateGoalWithAIDialog";
 
 const GoalHeader = () => {
   return (
